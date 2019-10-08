@@ -8,7 +8,7 @@
   "description": "Adam Duvin's http api assignment part 2 for Rich Media",
   "main": "./src/server.js",
   "scripts": {
-    "start": "node ./server.js",
+    "start": "node ./src/server.js",
     "pretest": "eslint ./src --fix",
     "test": "echo \"No Tests\"",
     "build": "babel ./client --out-file ./hosted/bundle.js",
@@ -28,9 +28,9 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "eslint": "^6.4.0",
+    "eslint": "^6.5.1",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.18.2",
-    "nodemon": "^1.19.2"
+    "nodemon": "^1.19.3"
   }
 }

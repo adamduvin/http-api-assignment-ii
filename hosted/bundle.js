@@ -1,3 +1,24 @@
+const parseJSON = (xhr, content) => {
+    //parse response (obj will be empty in a 204 updated)
+    const obj = JSON.parse(xhr.response);
+    console.dir(obj);
+
+    //if message in response, add to screen
+    if (obj.message) {
+        const p = document.createElement('p');
+        p.textContent = `Message: ${obj.message}`;
+        content.appendChild(p);
+    }
+
+    //if users in response, add to screen
+    if (obj.users) {
+        const userList = document.createElement('p');
+        const users = JSON.stringify(obj.users);
+        userList.textContent = users;
+        content.appendChild(userList);
+    }
+};
+
 const handleResponse = (xhr, parseResponses) => {
     const content = document.querySelector("#content");
 
@@ -5,20 +26,14 @@ const handleResponse = (xhr, parseResponses) => {
         case 200:
             content.innerHTML = `<b>Success</b>`;
             break;
+        case 201:
+            content.innerHTML = `<b>Created</b>`;
+            break;
+        case 204:
+            content.innerHTML = `<b>Updated</b>`;
+            break;
         case 400:
             content.innerHTML = `<b>Bad Request</b>`;
-            break;
-        case 401:
-            content.innerHTML = `<b>Unauthorized</b>`;
-            break;
-        case 403:
-            content.innerHTML = `<b>Forbidden</b>`;
-            break;
-        case 500:
-            content.innerHTML = `<b>Internal Server Error</b>`;
-            break;
-        case 501:
-            content.innerHTML = `<b>Feature not yet Implemented</b>`;
             break;
         case 404:
             content.innerHTML = `<b>Resource Not Found</b>`;
@@ -29,28 +44,18 @@ const handleResponse = (xhr, parseResponses) => {
     }
 
     if (parseResponses) {
-        let obj;
-        if (xhr.getResponseHeader('content-type') === 'text/xml') {
-            /*obj = JSON.parse(xhr.response);
-            console.dir(obj);*/
-        } else {
-            obj = JSON.parse(xhr.response);
-            console.dir(obj);
-        }
-        content.innerHTML += `<p>${xhr.response}</p>`;
-    } else {
-        content.innerHTML += '<p>Meta Data Received</p>';
-    }
-
-    if (obj.message) {
-        content.innerHTML += `<p>Message: ${obj.message}</p>`;
+        parseJSON(xhr, content);
     }
 };
 
-const sendAjax = (url, fileType, method) => {
+const sendAjax = (e, userForm) => {
+    const url = userForm.querySelector('#urlField').value;
+    console.dir(url);
+    const method = userForm.querySelector('#methodSelect').value;
+
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
-    xhr.setRequestHeader("Accept", fileType);
+    xhr.setRequestHeader("Accept", 'application/json');
     if (method == 'get') {
         xhr.onload = () => handleResponse(xhr, true);
     } else {
@@ -89,17 +94,15 @@ const sendPost = (e, nameForm) => {
 };
 
 const init = () => {
-    const nameForm = document.querySelector("#nameForm");
-    const userForm = document.querySelector("#userForm");
+    const nameForm = document.querySelector('#nameForm');
+    const userForm = document.querySelector('#userForm');
 
-    const sendRequest = () => {
-        sendAjax(userForm.querySelector('#urlField').value, 'application.json', userForm.querySelector('#methodSelect').value);
-    };
-
+    const getUsers = e => sendAjax(e, userForm);
     const addUser = e => sendPost(e, nameForm);
 
-    userForm.addEventListener('submit', sendRequest);
+    userForm.addEventListener('submit', getUsers);
     nameForm.addEventListener('submit', addUser);
+    console.dir('test');
 };
 
 window.onload = init;

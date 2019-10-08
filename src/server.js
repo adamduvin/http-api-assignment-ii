@@ -10,23 +10,28 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS,
+    '/bundle.js': htmlHandler.getBundle,
     '/getUsers': contentHandler.getUsers,
-    '/notReal': contentHandler.getNotReal,
+    '/notReal': contentHandler.notFound,
     '/success': contentHandler.success,
     '/badRequest': contentHandler.badRequest,
     notFound: contentHandler.notFound,
   },
   HEAD: {
     '/getUsers': contentHandler.getUsersMeta,
+    '/notReal': contentHandler.notFoundMeta,
     notFound: contentHandler.notFoundMeta,
+  },
+  POST: {
+    '/addUser': contentHandler.addUser,
   },
 };
 
-const handleGet = (request, response, parsedUrl, acceptedTypes) => {
+const handleGet = (request, response, parsedUrl) => {
   if (urlStruct[request.method][parsedUrl.pathname]) {
-    urlStruct[request.method][parsedUrl.pathname](request, response, acceptedTypes);
+    urlStruct[request.method][parsedUrl.pathname](request, response);
   } else {
-    urlStruct[request.method].notFound(request, response, acceptedTypes);
+    urlStruct[request.method].notFound(request, response);
   }
 };
 
@@ -57,12 +62,10 @@ const onRequest = (request, response) => {
   console.log(request.url);
   const parsedUrl = url.parse(request.url);
 
-  const acceptedTypes = request.headers.accept.split(',');
-
   if (request.method === 'POST') {
     handlePost(request, response, parsedUrl);
   } else {
-    handleGet(request, response, parsedUrl, acceptedTypes);
+    handleGet(request, response, parsedUrl);
   }
 };
 
